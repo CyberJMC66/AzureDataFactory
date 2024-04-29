@@ -30,7 +30,7 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     format: 'parquet') ~> OrderRaw",
-				"OrderRaw derive(ORDER_DATETIME = ERROR_FUNCTION('')) ~> derivedColumn1"
+				"OrderRaw derive(ORDER_DATE = ERROR_FUNCTION('toDate(ORDER_DATETIME), __SINGLE_QUOTE__dd-MMM-yy HH.mm.ss.SS__SINGLE_QUOTE__ )')) ~> derivedColumn1"
 			]
 		}
 	}
