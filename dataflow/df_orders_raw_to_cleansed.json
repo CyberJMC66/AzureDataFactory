@@ -9,7 +9,7 @@
 						"referenceName": "ds_raw_orders",
 						"type": "DatasetReference"
 					},
-					"name": "OrderRaw"
+					"name": "OrdersRaw"
 				},
 				{
 					"dataset": {
@@ -25,7 +25,10 @@
 						"referenceName": "ds_cleansed_orders",
 						"type": "DatasetReference"
 					},
-					"name": "OrdersSink"
+					"name": "OrdersCleansed"
+				},
+				{
+					"name": "OrderItemsCleansed"
 				}
 			],
 			"transformations": [
@@ -59,7 +62,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     format: 'parquet') ~> OrderRaw",
+				"     format: 'parquet') ~> OrdersRaw",
 				"source(output(",
 				"          ORDER_ID as short,",
 				"          LINE_ITEM_ID as short,",
@@ -70,7 +73,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> OrderItemsRaw",
-				"OrderRaw derive(ORDER_DATE = toDate(ORDER_DATETIME,'dd-MMM-yy HH.mm.ss.SS'),",
+				"OrdersRaw derive(ORDER_DATE = toDate(ORDER_DATETIME,'dd-MMM-yy HH.mm.ss.SS'),",
 				"          UPDATED_TIMESTAMP = currentUTC()) ~> derivedColumn1",
 				"derivedColumn1 cast(output(",
 				"          ORDER_ID as integer,",
@@ -103,7 +106,6 @@
 				"CastDataTypesOrderItems derive(UPDATED_TIMESTAMP = currentUTC()) ~> UpdatedTimeStampOrderItems",
 				"UpdatedTimeStampOrderItems select(mapColumn(",
 				"          ORDER_ID,",
-				"          LINE_ITEM_ID,",
 				"          PRODUCT_ID,",
 				"          UNIT_PRICE,",
 				"          QUANTITY,",
@@ -118,7 +120,11 @@
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> OrdersSink"
+				"     skipDuplicateMapOutputs: true) ~> OrdersCleansed",
+				"DropLineItemID sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> OrderItemsCleansed"
 			]
 		}
 	}
