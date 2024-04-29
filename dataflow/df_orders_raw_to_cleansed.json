@@ -12,13 +12,24 @@
 					"name": "OrderRaw"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_cleansed_orders",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "derivedColumn1"
 				},
 				{
 					"name": "CastDataTypesOrders"
+				},
+				{
+					"name": "DropOrderDateTimeandReorder"
 				}
 			],
 			"scriptLines": [
@@ -44,7 +55,25 @@
 				"          ORDER_DATE as date,",
 				"          UPDATED_TIMESTAMP as timestamp",
 				"     ),",
-				"     errors: true) ~> CastDataTypesOrders"
+				"     errors: true) ~> CastDataTypesOrders",
+				"CastDataTypesOrders select(mapColumn(",
+				"          ORDER_ID,",
+				"          ORDER_DATE,",
+				"          CUSTOMER_ID,",
+				"          ORDER_STATUS,",
+				"          STORE_ID,",
+				"          UPDATED_TIMESTAMP",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> DropOrderDateTimeandReorder",
+				"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
