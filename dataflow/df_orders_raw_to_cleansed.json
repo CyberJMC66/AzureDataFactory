@@ -24,6 +24,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "CustomersRaw"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_raw_products",
+						"type": "DatasetReference"
+					},
+					"name": "ProductsRaw"
 				}
 			],
 			"sinks": [
@@ -69,6 +76,9 @@
 				},
 				{
 					"name": "UpdatedTimeSTampCustomers"
+				},
+				{
+					"name": "CastDataTypesProducts"
 				}
 			],
 			"scriptLines": [
@@ -102,6 +112,15 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     documentForm: 'documentPerLine') ~> CustomersRaw",
+				"source(output(",
+				"          PRODUCT_ID as short,",
+				"          PRODUCT_NAME as string,",
+				"          UNIT_PRICE as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'documentPerLine') ~> ProductsRaw",
 				"OrdersRaw derive(ORDER_DATE = toDate(ORDER_DATETIME,'dd-MMM-yy HH.mm.ss.SS'),",
 				"          UPDATED_TIMESTAMP = currentUTC()) ~> derivedColumn1",
 				"derivedColumn1 cast(output(",
@@ -149,6 +168,10 @@
 				"     ),",
 				"     errors: true) ~> CastDataTypesCustomers",
 				"CastDataTypesCustomers derive(UPDATED_TIMESTAMP = currentutc()) ~> UpdatedTimeSTampCustomers",
+				"ProductsRaw cast(output(",
+				"          PRODUCT_ID as short",
+				"     ),",
+				"     errors: true) ~> CastDataTypesProducts",
 				"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
