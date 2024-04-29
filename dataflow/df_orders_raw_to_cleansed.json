@@ -10,6 +10,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "OrderRaw"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_raw_order_items",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
 				}
 			],
 			"sinks": [
@@ -18,7 +25,7 @@
 						"referenceName": "ds_cleansed_orders",
 						"type": "DatasetReference"
 					},
-					"name": "sink1"
+					"name": "OrdersSink"
 				}
 			],
 			"transformations": [
@@ -44,6 +51,16 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     format: 'parquet') ~> OrderRaw",
+				"source(output(",
+				"          ORDER_ID as short,",
+				"          LINE_ITEM_ID as short,",
+				"          PRODUCT_ID as short,",
+				"          UNIT_PRICE as double,",
+				"          QUANTITY as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
 				"OrderRaw derive(ORDER_DATE = toDate(ORDER_DATETIME,'dd-MMM-yy HH.mm.ss.SS'),",
 				"          UPDATED_TIMESTAMP = currentUTC()) ~> derivedColumn1",
 				"derivedColumn1 cast(output(",
@@ -73,7 +90,7 @@
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1"
+				"     skipDuplicateMapOutputs: true) ~> OrdersSink"
 			]
 		}
 	}
