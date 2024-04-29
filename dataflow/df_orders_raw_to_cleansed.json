@@ -79,6 +79,9 @@
 				},
 				{
 					"name": "CastDataTypesProducts"
+				},
+				{
+					"name": "UpdatedTimeSTampProducts"
 				}
 			],
 			"scriptLines": [
@@ -169,9 +172,12 @@
 				"     errors: true) ~> CastDataTypesCustomers",
 				"CastDataTypesCustomers derive(UPDATED_TIMESTAMP = currentutc()) ~> UpdatedTimeSTampCustomers",
 				"ProductsRaw cast(output(",
-				"          PRODUCT_ID as short",
+				"          PRODUCT_ID as integer,",
+				"          PRODUCT_NAME as string,",
+				"          UNIT_PRICE as double",
 				"     ),",
 				"     errors: true) ~> CastDataTypesProducts",
+				"CastDataTypesProducts derive() ~> UpdatedTimeSTampProducts",
 				"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
