@@ -59,6 +59,9 @@
 				},
 				{
 					"name": "CastDataTypesCustomers"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -133,9 +136,12 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> DropLineItemID",
 				"CustomersRaw cast(output(",
-				"          CUSTOMER_ID as short",
+				"          CUSTOMER_ID as integer,",
+				"          EMAIL_ADDRESS as string,",
+				"          FULL_NAME as string",
 				"     ),",
 				"     errors: true) ~> CastDataTypesCustomers",
+				"CastDataTypesCustomers derive(UPDATED_TIMESTAMP = currentutc()) ~> derivedColumn2",
 				"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
