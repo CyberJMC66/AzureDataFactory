@@ -1,5 +1,5 @@
 {
-	"name": "dataflow2",
+	"name": "df_orders_raw_to_cleansed",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
@@ -9,11 +9,15 @@
 						"referenceName": "ds_raw_orders",
 						"type": "DatasetReference"
 					},
-					"name": "source1"
+					"name": "OrderRaw"
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          ORDER_ID as string,",
@@ -25,7 +29,8 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     format: 'parquet') ~> source1"
+				"     format: 'parquet') ~> OrderRaw",
+				"OrderRaw derive(ORDER_DATETIME = ERROR_FUNCTION('')) ~> derivedColumn1"
 			]
 		}
 	}
