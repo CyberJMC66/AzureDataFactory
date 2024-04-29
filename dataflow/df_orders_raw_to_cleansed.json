@@ -16,6 +16,9 @@
 			"transformations": [
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "CastDataTypesOrders"
 				}
 			],
 			"scriptLines": [
@@ -31,7 +34,17 @@
 				"     ignoreNoFilesFound: false,",
 				"     format: 'parquet') ~> OrderRaw",
 				"OrderRaw derive(ORDER_DATE = toDate(ORDER_DATETIME,'dd-MMM-yy HH.mm.ss.SS'),",
-				"          UPDATED_TIMESTAMP = currentUTC()) ~> derivedColumn1"
+				"          UPDATED_TIMESTAMP = currentUTC()) ~> derivedColumn1",
+				"derivedColumn1 cast(output(",
+				"          ORDER_ID as integer,",
+				"          ORDER_DATETIME as string,",
+				"          CUSTOMER_ID as integer,",
+				"          ORDER_STATUS as string,",
+				"          STORE_ID as integer,",
+				"          ORDER_DATE as date,",
+				"          UPDATED_TIMESTAMP as timestamp",
+				"     ),",
+				"     errors: true) ~> CastDataTypesOrders"
 			]
 		}
 	}
