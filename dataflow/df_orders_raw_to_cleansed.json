@@ -50,6 +50,9 @@
 						"type": "DatasetReference"
 					},
 					"name": "CustomersCleansed"
+				},
+				{
+					"name": "ProductsCleansed"
 				}
 			],
 			"transformations": [
@@ -177,7 +180,7 @@
 				"          UNIT_PRICE as double",
 				"     ),",
 				"     errors: true) ~> CastDataTypesProducts",
-				"CastDataTypesProducts derive() ~> UpdatedTimeSTampProducts",
+				"CastDataTypesProducts derive(UPDATED_TIMESTAMP = currentUTC()) ~> UpdatedTimeSTampProducts",
 				"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
@@ -197,7 +200,11 @@
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> CustomersCleansed"
+				"     skipDuplicateMapOutputs: true) ~> CustomersCleansed",
+				"UpdatedTimeSTampProducts sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ProductsCleansed"
 			]
 		}
 	}
