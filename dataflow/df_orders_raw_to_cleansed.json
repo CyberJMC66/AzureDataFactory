@@ -64,6 +64,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "ProductsCleansed"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_cleansed_stores",
+						"type": "DatasetReference"
+					},
+					"name": "StoresCleansed"
 				}
 			],
 			"transformations": [
@@ -102,6 +109,9 @@
 				},
 				{
 					"name": "DropWebAddressAndReorder"
+				},
+				{
+					"name": "UpdatedTimeStampeStores"
 				}
 			],
 			"scriptLines": [
@@ -225,6 +235,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> DropWebAddressAndReorder",
+				"DropWebAddressAndReorder derive(UPDATED_TIMESTAMP = currentUTC()) ~> UpdatedTimeStampeStores",
 				"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
@@ -252,7 +263,15 @@
 				"     preCommands: [],",
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> ProductsCleansed"
+				"     skipDuplicateMapOutputs: true) ~> ProductsCleansed",
+				"UpdatedTimeStampeStores sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> StoresCleansed"
 			]
 		}
 	}
