@@ -30,7 +30,7 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     format: 'parquet') ~> source1",
-				"source1 derive(UPDATED_TIMESTAMP = ERROR_FUNCTION('')) ~> derivedColumn1"
+				"source1 derive(UPDATED_TIMESTAMP = currentUTC()) ~> derivedColumn1"
 			]
 		}
 	}
