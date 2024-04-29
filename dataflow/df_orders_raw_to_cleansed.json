@@ -1,0 +1,25 @@
+{
+	"name": "df_orders_raw_to_cleansed",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_raw_orders",
+						"type": "DatasetReference"
+					},
+					"name": "OrdersRaw"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'parquet') ~> OrdersRaw"
+			]
+		}
+	}
+}
