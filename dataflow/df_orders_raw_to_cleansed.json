@@ -17,6 +17,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "OrderItemsRaw"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_raw_customers",
+						"type": "DatasetReference"
+					},
+					"name": "CustomersRaw"
 				}
 			],
 			"sinks": [
@@ -73,6 +80,15 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> OrderItemsRaw",
+				"source(output(",
+				"          CUSTOMER_ID as short,",
+				"          EMAIL_ADDRESS as string,",
+				"          FULL_NAME as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'documentPerLine') ~> CustomersRaw",
 				"OrdersRaw derive(ORDER_DATE = toDate(ORDER_DATETIME,'dd-MMM-yy HH.mm.ss.SS'),",
 				"          UPDATED_TIMESTAMP = currentUTC()) ~> derivedColumn1",
 				"derivedColumn1 cast(output(",
