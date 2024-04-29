@@ -56,6 +56,9 @@
 				},
 				{
 					"name": "DropLineItemID"
+				},
+				{
+					"name": "CastDataTypesCustomers"
 				}
 			],
 			"scriptLines": [
@@ -129,6 +132,10 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> DropLineItemID",
+				"CustomersRaw cast(output(",
+				"          CUSTOMER_ID as short",
+				"     ),",
+				"     errors: true) ~> CastDataTypesCustomers",
 				"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
