@@ -55,6 +55,118 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_cleansed_customers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_dl_orders",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "03 Cleansed"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "customers",
+						"fileSystem": "cleansed"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_dl_orders')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_cleansed_order_items')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_dl_orders",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "03 Cleansed"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "order_items",
+						"fileSystem": "cleansed"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_dl_orders')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_cleansed_products')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_dl_orders",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "03 Cleansed"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "products",
+						"fileSystem": "cleansed"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_dl_orders')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_cleansed_stores')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_dl_orders",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "03 Cleansed"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "stores",
+						"fileSystem": "cleansed"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_dl_orders')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_landing_customers')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -290,11 +402,33 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": "orders.parquet",
 						"fileSystem": "raw"
 					},
 					"compressionCodec": "snappy"
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "ORDER_ID",
+						"type": "UTF8"
+					},
+					{
+						"name": "ORDER_DATETIME",
+						"type": "UTF8"
+					},
+					{
+						"name": "CUSTOMER_ID",
+						"type": "UTF8"
+					},
+					{
+						"name": "ORDER_STATUS",
+						"type": "UTF8"
+					},
+					{
+						"name": "STORE_ID",
+						"type": "UTF8"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_dl_orders')]"
@@ -355,7 +489,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ds_test_sink_order_items')]",
+			"name": "[concat(parameters('factoryName'), '/ds_cleansed_orders')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -363,19 +497,18 @@
 					"referenceName": "ls_dl_orders",
 					"type": "LinkedServiceReference"
 				},
+				"folder": {
+					"name": "03 Cleansed"
+				},
 				"annotations": [],
-				"type": "DelimitedText",
+				"type": "Parquet",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "order_items.csv",
-						"folderPath": "sink",
-						"fileSystem": "test"
+						"folderPath": "orders",
+						"fileSystem": "cleansed"
 					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
+					"compressionCodec": "snappy"
 				},
 				"schema": []
 			},
@@ -706,7 +839,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/df_test')]",
+			"name": "[concat(parameters('factoryName'), '/df_orders_raw_to_cleansed')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -715,23 +848,130 @@
 					"sources": [
 						{
 							"dataset": {
+								"referenceName": "ds_raw_orders",
+								"type": "DatasetReference"
+							},
+							"name": "OrdersRaw"
+						},
+						{
+							"dataset": {
 								"referenceName": "ds_raw_order_items",
 								"type": "DatasetReference"
 							},
 							"name": "OrderItemsRaw"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_raw_customers",
+								"type": "DatasetReference"
+							},
+							"name": "CustomersRaw"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_raw_products",
+								"type": "DatasetReference"
+							},
+							"name": "ProductsRaw"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_raw_stores",
+								"type": "DatasetReference"
+							},
+							"name": "StoresRaw"
 						}
 					],
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "ds_test_sink_order_items",
+								"referenceName": "ds_cleansed_orders",
 								"type": "DatasetReference"
 							},
-							"name": "OrderItemsTestSink"
+							"name": "OrdersCleansed"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_cleansed_order_items",
+								"type": "DatasetReference"
+							},
+							"name": "OrderItemsCleansed"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_cleansed_customers",
+								"type": "DatasetReference"
+							},
+							"name": "CustomersCleansed"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_cleansed_products",
+								"type": "DatasetReference"
+							},
+							"name": "ProductsCleansed"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_cleansed_stores",
+								"type": "DatasetReference"
+							},
+							"name": "StoresCleansed"
 						}
 					],
-					"transformations": [],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "CastDataTypesOrders"
+						},
+						{
+							"name": "DropOrderDateTimeandReorder"
+						},
+						{
+							"name": "CastDataTypesOrderItems"
+						},
+						{
+							"name": "UpdatedTimeStampOrderItems"
+						},
+						{
+							"name": "DropLineItemID"
+						},
+						{
+							"name": "CastDataTypesCustomers"
+						},
+						{
+							"name": "UpdatedTimeSTampCustomers"
+						},
+						{
+							"name": "CastDataTypesProducts"
+						},
+						{
+							"name": "UpdatedTimeSTampProducts"
+						},
+						{
+							"name": "CastDataTypesStores"
+						},
+						{
+							"name": "DropWebAddressAndReorder"
+						},
+						{
+							"name": "UpdatedTimeStampeStores"
+						}
+					],
 					"scriptLines": [
+						"source(output(",
+						"          ORDER_ID as string,",
+						"          ORDER_DATETIME as string,",
+						"          CUSTOMER_ID as string,",
+						"          ORDER_STATUS as string,",
+						"          STORE_ID as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'parquet') ~> OrdersRaw",
 						"source(output(",
 						"          ORDER_ID as short,",
 						"          LINE_ITEM_ID as short,",
@@ -742,24 +982,164 @@
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     ignoreNoFilesFound: false) ~> OrderItemsRaw",
-						"OrderItemsRaw sink(allowSchemaDrift: true,",
+						"source(output(",
+						"          CUSTOMER_ID as short,",
+						"          EMAIL_ADDRESS as string,",
+						"          FULL_NAME as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'documentPerLine') ~> CustomersRaw",
+						"source(output(",
+						"          PRODUCT_ID as short,",
+						"          PRODUCT_NAME as string,",
+						"          UNIT_PRICE as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'documentPerLine') ~> ProductsRaw",
+						"source(output(",
+						"          LATITUDE as double,",
+						"          LONGITUDE as double,",
+						"          STORE_ID as short,",
+						"          STORE_NAME as string,",
+						"          WEB_ADDRESS as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'documentPerLine') ~> StoresRaw",
+						"OrdersRaw derive(ORDER_DATE = toDate(ORDER_DATETIME,'dd-MMM-yy HH.mm.ss.SS'),",
+						"          UPDATED_TIMESTAMP = currentUTC()) ~> derivedColumn1",
+						"derivedColumn1 cast(output(",
+						"          ORDER_ID as integer,",
+						"          ORDER_DATETIME as string,",
+						"          CUSTOMER_ID as integer,",
+						"          ORDER_STATUS as string,",
+						"          STORE_ID as integer,",
+						"          ORDER_DATE as date,",
+						"          UPDATED_TIMESTAMP as timestamp",
+						"     ),",
+						"     errors: true) ~> CastDataTypesOrders",
+						"CastDataTypesOrders select(mapColumn(",
+						"          ORDER_ID,",
+						"          ORDER_DATE,",
+						"          CUSTOMER_ID,",
+						"          ORDER_STATUS,",
+						"          STORE_ID,",
+						"          UPDATED_TIMESTAMP",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> DropOrderDateTimeandReorder",
+						"OrderItemsRaw cast(output(",
+						"          ORDER_ID as integer,",
+						"          LINE_ITEM_ID as short,",
+						"          PRODUCT_ID as integer,",
+						"          UNIT_PRICE as double,",
+						"          QUANTITY as integer",
+						"     ),",
+						"     errors: true) ~> CastDataTypesOrderItems",
+						"CastDataTypesOrderItems derive(UPDATED_TIMESTAMP = currentUTC()) ~> UpdatedTimeStampOrderItems",
+						"UpdatedTimeStampOrderItems select(mapColumn(",
+						"          ORDER_ID,",
+						"          PRODUCT_ID,",
+						"          UNIT_PRICE,",
+						"          QUANTITY,",
+						"          UPDATED_TIMESTAMP",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> DropLineItemID",
+						"CustomersRaw cast(output(",
+						"          CUSTOMER_ID as integer,",
+						"          EMAIL_ADDRESS as string,",
+						"          FULL_NAME as string",
+						"     ),",
+						"     errors: true) ~> CastDataTypesCustomers",
+						"CastDataTypesCustomers derive(UPDATED_TIMESTAMP = currentUTC()) ~> UpdatedTimeSTampCustomers",
+						"ProductsRaw cast(output(",
+						"          PRODUCT_ID as integer,",
+						"          PRODUCT_NAME as string,",
+						"          UNIT_PRICE as double",
+						"     ),",
+						"     errors: true) ~> CastDataTypesProducts",
+						"CastDataTypesProducts derive(UPDATED_TIMESTAMP = currentUTC()) ~> UpdatedTimeSTampProducts",
+						"StoresRaw cast(output(",
+						"          LATITUDE as double,",
+						"          LONGITUDE as double,",
+						"          STORE_ID as integer,",
+						"          STORE_NAME as string,",
+						"          WEB_ADDRESS as string",
+						"     ),",
+						"     errors: true) ~> CastDataTypesStores",
+						"CastDataTypesStores select(mapColumn(",
+						"          STORE_ID,",
+						"          STORE_NAME,",
+						"          LATITUDE,",
+						"          LONGITUDE",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> DropWebAddressAndReorder",
+						"DropWebAddressAndReorder derive(UPDATED_TIMESTAMP = currentUTC()) ~> UpdatedTimeStampeStores",
+						"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('roundRobin', 4)) ~> OrderItemsTestSink"
+						"     skipDuplicateMapOutputs: true) ~> OrdersCleansed",
+						"DropLineItemID sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> OrderItemsCleansed",
+						"UpdatedTimeSTampCustomers sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> CustomersCleansed",
+						"UpdatedTimeSTampProducts sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> ProductsCleansed",
+						"UpdatedTimeStampeStores sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> StoresCleansed"
 					]
 				}
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_raw_orders')]",
 				"[concat(variables('factoryId'), '/datasets/ds_raw_order_items')]",
-				"[concat(variables('factoryId'), '/datasets/ds_test_sink_order_items')]"
+				"[concat(variables('factoryId'), '/datasets/ds_raw_customers')]",
+				"[concat(variables('factoryId'), '/datasets/ds_raw_products')]",
+				"[concat(variables('factoryId'), '/datasets/ds_raw_stores')]",
+				"[concat(variables('factoryId'), '/datasets/ds_cleansed_orders')]",
+				"[concat(variables('factoryId'), '/datasets/ds_cleansed_order_items')]",
+				"[concat(variables('factoryId'), '/datasets/ds_cleansed_customers')]",
+				"[concat(variables('factoryId'), '/datasets/ds_cleansed_products')]",
+				"[concat(variables('factoryId'), '/datasets/ds_cleansed_stores')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_test')]",
+			"name": "[concat(parameters('factoryName'), '/pl_orders_raw_to_cleansed')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -778,13 +1158,22 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "df_test",
+								"referenceName": "df_orders_raw_to_cleansed",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
+									"OrdersRaw": {},
 									"OrderItemsRaw": {},
-									"OrderItemsTestSink": {}
-								}
+									"CustomersRaw": {},
+									"ProductsRaw": {},
+									"StoresRaw": {},
+									"OrdersCleansed": {},
+									"OrderItemsCleansed": {},
+									"CustomersCleansed": {},
+									"ProductsCleansed": {},
+									"StoresCleansed": {}
+								},
+								"linkedServiceParameters": {}
 							},
 							"staging": {},
 							"compute": {
@@ -798,11 +1187,10 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"annotations": [],
-				"lastPublishTime": "2024-04-22T17:14:32Z"
+				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/df_test')]"
+				"[concat(variables('factoryId'), '/dataflows/df_orders_raw_to_cleansed')]"
 			]
 		}
 	]
