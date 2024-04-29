@@ -16,7 +16,7 @@
 						"referenceName": "ds_raw_order_items",
 						"type": "DatasetReference"
 					},
-					"name": "source1"
+					"name": "OrderItemsRaw"
 				}
 			],
 			"sinks": [
@@ -37,6 +37,9 @@
 				},
 				{
 					"name": "DropOrderDateTimeandReorder"
+				},
+				{
+					"name": "CastDataTypesOrderItems"
 				}
 			],
 			"scriptLines": [
@@ -60,7 +63,7 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> source1",
+				"     ignoreNoFilesFound: false) ~> OrderItemsRaw",
 				"OrderRaw derive(ORDER_DATE = toDate(ORDER_DATETIME,'dd-MMM-yy HH.mm.ss.SS'),",
 				"          UPDATED_TIMESTAMP = currentUTC()) ~> derivedColumn1",
 				"derivedColumn1 cast(output(",
@@ -83,6 +86,14 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> DropOrderDateTimeandReorder",
+				"OrderItemsRaw cast(output(",
+				"          ORDER_ID as integer,",
+				"          LINE_ITEM_ID as short,",
+				"          PRODUCT_ID as integer,",
+				"          UNIT_PRICE as double,",
+				"          QUANTITY as integer",
+				"     ),",
+				"     errors: true) ~> CastDataTypesOrderItems",
 				"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
