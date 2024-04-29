@@ -49,6 +49,10 @@
 					"name": "OrdersCleansed"
 				},
 				{
+					"dataset": {
+						"referenceName": "ds_cleansed_order_items",
+						"type": "DatasetReference"
+					},
 					"name": "OrderItemsCleansed"
 				},
 				{
@@ -246,6 +250,10 @@
 				"     skipDuplicateMapOutputs: true) ~> OrdersCleansed",
 				"DropLineItemID sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> OrderItemsCleansed",
 				"UpdatedTimeSTampCustomers sink(allowSchemaDrift: true,",
