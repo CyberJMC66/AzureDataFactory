@@ -31,6 +31,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "ProductsRaw"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_raw_stores",
+						"type": "DatasetReference"
+					},
+					"name": "StoresRaw"
 				}
 			],
 			"sinks": [
@@ -52,6 +59,10 @@
 					"name": "CustomersCleansed"
 				},
 				{
+					"dataset": {
+						"referenceName": "ds_cleansed_products",
+						"type": "DatasetReference"
+					},
 					"name": "ProductsCleansed"
 				}
 			],
@@ -85,6 +96,9 @@
 				},
 				{
 					"name": "UpdatedTimeSTampProducts"
+				},
+				{
+					"name": "cast1"
 				}
 			],
 			"scriptLines": [
@@ -127,6 +141,17 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     documentForm: 'documentPerLine') ~> ProductsRaw",
+				"source(output(",
+				"          LATITUDE as double,",
+				"          LONGITUDE as double,",
+				"          STORE_ID as short,",
+				"          STORE_NAME as string,",
+				"          WEB_ADDRESS as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'documentPerLine') ~> StoresRaw",
 				"OrdersRaw derive(ORDER_DATE = toDate(ORDER_DATETIME,'dd-MMM-yy HH.mm.ss.SS'),",
 				"          UPDATED_TIMESTAMP = currentUTC()) ~> derivedColumn1",
 				"derivedColumn1 cast(output(",
@@ -181,6 +206,10 @@
 				"     ),",
 				"     errors: true) ~> CastDataTypesProducts",
 				"CastDataTypesProducts derive(UPDATED_TIMESTAMP = currentUTC()) ~> UpdatedTimeSTampProducts",
+				"StoresRaw cast(output(",
+				"          LATITUDE as double",
+				"     ),",
+				"     errors: true) ~> cast1",
 				"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
@@ -203,6 +232,10 @@
 				"     skipDuplicateMapOutputs: true) ~> CustomersCleansed",
 				"UpdatedTimeSTampProducts sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> ProductsCleansed"
 			]
