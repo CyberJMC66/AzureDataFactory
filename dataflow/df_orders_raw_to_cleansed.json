@@ -36,6 +36,13 @@
 				},
 				{
 					"name": "OrderItemsCleansed"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_cleansed_customers",
+						"type": "DatasetReference"
+					},
+					"name": "CustomersCleansed"
 				}
 			],
 			"transformations": [
@@ -61,7 +68,7 @@
 					"name": "CastDataTypesCustomers"
 				},
 				{
-					"name": "derivedColumn2"
+					"name": "UpdatedTimeSTampCustomers"
 				}
 			],
 			"scriptLines": [
@@ -141,7 +148,7 @@
 				"          FULL_NAME as string",
 				"     ),",
 				"     errors: true) ~> CastDataTypesCustomers",
-				"CastDataTypesCustomers derive(UPDATED_TIMESTAMP = currentutc()) ~> derivedColumn2",
+				"CastDataTypesCustomers derive(UPDATED_TIMESTAMP = currentutc()) ~> UpdatedTimeSTampCustomers",
 				"DropOrderDateTimeandReorder sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
@@ -153,7 +160,15 @@
 				"DropLineItemID sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> OrderItemsCleansed"
+				"     skipDuplicateMapOutputs: true) ~> OrderItemsCleansed",
+				"UpdatedTimeSTampCustomers sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> CustomersCleansed"
 			]
 		}
 	}
