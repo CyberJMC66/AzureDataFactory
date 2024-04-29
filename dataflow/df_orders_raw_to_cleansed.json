@@ -215,7 +215,7 @@
 				"          FULL_NAME as string",
 				"     ),",
 				"     errors: true) ~> CastDataTypesCustomers",
-				"CastDataTypesCustomers derive(UPDATED_TIMESTAMP = currentutc()) ~> UpdatedTimeSTampCustomers",
+				"CastDataTypesCustomers derive(UPDATED_TIMESTAMP = currentUTC()) ~> UpdatedTimeSTampCustomers",
 				"ProductsRaw cast(output(",
 				"          PRODUCT_ID as integer,",
 				"          PRODUCT_NAME as string,",
